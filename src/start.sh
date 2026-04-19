@@ -202,6 +202,26 @@ wait_for_downloads() {
     return "$status"
 }
 
+ensure_model_alias() {
+    local source_path="$1"
+    local target_path="$2"
+
+    if [ ! -f "$source_path" ]; then
+        echo "⚠️  Alias source missing, skipping: $source_path"
+        return 1
+    fi
+
+    mkdir -p "$(dirname "$target_path")"
+    rm -f "$target_path"
+
+    if ln -s "$source_path" "$target_path" 2>/dev/null; then
+        echo "🔗 Linked model alias: $target_path -> $source_path"
+    else
+        cp -f "$source_path" "$target_path"
+        echo "📄 Copied model alias: $target_path"
+    fi
+}
+
 is_huggingface_resolve_url() {
     local url="$1"
     [[ "$url" =~ ^https://huggingface\.co/.+/resolve/.+$ ]]
@@ -324,6 +344,10 @@ run_optional_downloads() {
     if ! wait_for_downloads MODEL_DOWNLOAD_PIDS "managed model"; then
         return 1
     fi
+
+    ensure_model_alias \
+        "$TEXT_ENCODERS_DIR/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors" \
+        "$CLIP_VISION_DIR/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors"
 
     CHECKPOINT_IDS_TO_DOWNLOAD="${CHECKPOINT_IDS_TO_DOWNLOAD:-replace_with_ids}"
     DEFAULT_LORAS_IDS_TO_DOWNLOAD="2263030,2263094,2293529,2293622,2377549,2377566,2098405,2098396,2245356,2245426,2545249,2545246,2156392,2156435,2169837,2169847,2648813,2648814,2663475,2663487,2377035,2377244,2235299,2235288,2325788,2191446,2441730,2445044,2212384,2212394,2352366,2352388,2445168,2445176,2187729,2187757,2448064,2448070,2272024,2272102,2620366,2622170,2785769,2786571,2510280,2510218,2595899,2595905,2303927,2303966,2308339,2308328,2176450,2178869,2460386,2460428,2197409,2215731,2430424,2430183,2303232,2303184,2438671,2433303,2373814,2373843,2779234,2779292,2516837,2516839"
