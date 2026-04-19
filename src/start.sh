@@ -296,6 +296,87 @@ download_model() {
     echo "Download started in background for $destination_file"
 }
 
+run_optional_downloads() {
+    echo "Downloading managed Hugging Face / direct URL models..."
+    download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_high_noise_14B_fp16.safetensors"
+    download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_low_noise_14B_fp16.safetensors"
+    download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_high_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_A14b_high_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors"
+    download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_low_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_A14b_low_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors"
+    download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" "$TEXT_ENCODERS_DIR/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-bf16.safetensors" "$TEXT_ENCODERS_DIR/umt5-xxl-enc-bf16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors" "$TEXT_ENCODERS_DIR/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors"
+    download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" "$CLIP_VISION_DIR/clip_vision_h.safetensors"
+    download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors" "$VAE_DIR/wan_2.1_vae.safetensors"
+    download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors"
+    download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors" "$LORAS_DIR/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_MoE_distill_lora_rank_64_bf16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_MoE_distill_lora_rank_64_bf16.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.2-I2V-A14B-Moe-Distill-Lightx2v/resolve/main/loras/low_noise_model_rank64.safetensors" "$LORAS_DIR/Wan2.2-I2V-A14B-Moe-Distill-Lightx2v_low_noise_model_rank64.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v/resolve/main/loras/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors" "$LORAS_DIR/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors"
+    download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"
+
+    echo "⏳ Waiting for managed model downloads to complete..."
+    if ! wait_for_downloads MODEL_DOWNLOAD_PIDS "managed model"; then
+        return 1
+    fi
+
+    CHECKPOINT_IDS_TO_DOWNLOAD="${CHECKPOINT_IDS_TO_DOWNLOAD:-replace_with_ids}"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD="2263030,2263094,2293529,2293622,2377549,2377566,2098405,2098396,2245356,2245426,2545249,2545246,2156392,2156435,2169837,2169847,2648813,2648814,2663475,2663487,2377035,2377244,2235299,2235288,2325788,2191446,2441730,2445044,2212384,2212394,2352366,2352388,2445168,2445176,2187729,2187757,2448064,2448070,2272024,2272102,2620366,2622170,2785769,2786571,2510280,2510218,2595899,2595905,2303927,2303966,2308339,2308328,2176450,2178869,2460386,2460428,2197409,2215731,2430424,2430183,2303232,2303184,2438671,2433303,2373814,2373843,2779234,2779292,2516837,2516839"
+    if [ -z "${LORAS_IDS_TO_DOWNLOAD:-}" ] || [ "$LORAS_IDS_TO_DOWNLOAD" = "replace_with_ids" ]; then
+        LORAS_IDS_TO_DOWNLOAD="$DEFAULT_LORAS_IDS_TO_DOWNLOAD"
+    fi
+
+    declare -A MODEL_CATEGORIES=(
+        ["$NETWORK_VOLUME/ComfyUI/models/checkpoints"]="$CHECKPOINT_IDS_TO_DOWNLOAD"
+        ["$NETWORK_VOLUME/ComfyUI/models/loras"]="$LORAS_IDS_TO_DOWNLOAD"
+    )
+
+    download_count=0
+
+    for TARGET_DIR in "${!MODEL_CATEGORIES[@]}"; do
+        mkdir -p "$TARGET_DIR"
+        MODEL_IDS_STRING="${MODEL_CATEGORIES[$TARGET_DIR]}"
+
+        if [[ "$MODEL_IDS_STRING" == "replace_with_ids" ]]; then
+            echo "⏭️  Skipping downloads for $TARGET_DIR (default value detected)"
+            continue
+        fi
+
+        IFS=',' read -ra MODEL_IDS <<< "$MODEL_IDS_STRING"
+
+        for MODEL_ID in "${MODEL_IDS[@]}"; do
+            sleep 1
+            wait_for_slot "$CIVITAI_MAX_PARALLEL" CIVITAI_DOWNLOAD_PIDS
+            echo "🚀 Scheduling download: $MODEL_ID to $TARGET_DIR"
+            (cd "$TARGET_DIR" && download_with_aria.py -m "$MODEL_ID") &
+            CIVITAI_DOWNLOAD_PIDS+=("$!")
+            ((download_count++))
+        done
+    done
+
+    echo "📋 Scheduled $download_count downloads in background"
+    echo "⏳ Waiting for downloads to complete..."
+    if ! wait_for_downloads CIVITAI_DOWNLOAD_PIDS "CivitAI"; then
+        return 1
+    fi
+
+    echo "✅ All models downloaded successfully!"
+    echo "All downloads completed!"
+    echo "Finished downloading models!"
+
+    echo "Renaming loras downloaded as zip files to safetensors files"
+    cd "$LORAS_DIR" || return 1
+    for file in *.zip; do
+        [ -e "$file" ] || break
+        mv "$file" "${file%.zip}.safetensors"
+    done
+}
+
 # Define base paths
 DIFFUSION_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/diffusion_models"
 TEXT_ENCODERS_DIR="$NETWORK_VOLUME/ComfyUI/models/text_encoders"
@@ -303,86 +384,6 @@ CLIP_VISION_DIR="$NETWORK_VOLUME/ComfyUI/models/clip_vision"
 VAE_DIR="$NETWORK_VOLUME/ComfyUI/models/vae"
 LORAS_DIR="$NETWORK_VOLUME/ComfyUI/models/loras"
 DETECTION_DIR="$NETWORK_VOLUME/ComfyUI/models/detection"
-
-echo "Downloading managed Hugging Face / direct URL models..."
-download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_high_noise_14B_fp16.safetensors"
-download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_low_noise_14B_fp16.safetensors"
-download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_high_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_A14b_high_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors"
-download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_low_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_A14b_low_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors"
-download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" "$TEXT_ENCODERS_DIR/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-bf16.safetensors" "$TEXT_ENCODERS_DIR/umt5-xxl-enc-bf16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors" "$TEXT_ENCODERS_DIR/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors"
-download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" "$CLIP_VISION_DIR/clip_vision_h.safetensors"
-download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors" "$VAE_DIR/wan_2.1_vae.safetensors"
-download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors"
-download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors" "$LORAS_DIR/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_256_fp16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_256_fp16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_MoE_distill_lora_rank_64_bf16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_MoE_distill_lora_rank_64_bf16.safetensors"
-download_model "https://huggingface.co/lightx2v/Wan2.2-I2V-A14B-Moe-Distill-Lightx2v/resolve/main/loras/low_noise_model_rank64.safetensors" "$LORAS_DIR/Wan2.2-I2V-A14B-Moe-Distill-Lightx2v_low_noise_model_rank64.safetensors"
-download_model "https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v/resolve/main/loras/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors" "$LORAS_DIR/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors"
-download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"
-
-echo "⏳ Waiting for managed model downloads to complete..."
-if ! wait_for_downloads MODEL_DOWNLOAD_PIDS "managed model"; then
-    exit 1
-fi
-
-CHECKPOINT_IDS_TO_DOWNLOAD="${CHECKPOINT_IDS_TO_DOWNLOAD:-replace_with_ids}"
-DEFAULT_LORAS_IDS_TO_DOWNLOAD="2263030,2263094,2293529,2293622,2377549,2377566,2098405,2098396,2245356,2245426,2545249,2545246,2156392,2156435,2169837,2169847,2648813,2648814,2663475,2663487,2377035,2377244,2235299,2235288,2325788,2191446,2441730,2445044,2212384,2212394,2352366,2352388,2445168,2445176,2187729,2187757,2448064,2448070,2272024,2272102,2620366,2622170,2785769,2786571,2510280,2510218,2595899,2595905,2303927,2303966,2308339,2308328,2176450,2178869,2460386,2460428,2197409,2215731,2430424,2430183,2303232,2303184,2438671,2433303,2373814,2373843,2779234,2779292,2516837,2516839"
-if [ -z "${LORAS_IDS_TO_DOWNLOAD:-}" ] || [ "$LORAS_IDS_TO_DOWNLOAD" = "replace_with_ids" ]; then
-    LORAS_IDS_TO_DOWNLOAD="$DEFAULT_LORAS_IDS_TO_DOWNLOAD"
-fi
-
-declare -A MODEL_CATEGORIES=(
-    ["$NETWORK_VOLUME/ComfyUI/models/checkpoints"]="$CHECKPOINT_IDS_TO_DOWNLOAD"
-    ["$NETWORK_VOLUME/ComfyUI/models/loras"]="$LORAS_IDS_TO_DOWNLOAD"
-)
-
-# Counter to track background jobs
-download_count=0
-
-# Ensure directories exist and schedule downloads in background
-for TARGET_DIR in "${!MODEL_CATEGORIES[@]}"; do
-    mkdir -p "$TARGET_DIR"
-    MODEL_IDS_STRING="${MODEL_CATEGORIES[$TARGET_DIR]}"
-
-    # Skip if the value is the default placeholder
-    if [[ "$MODEL_IDS_STRING" == "replace_with_ids" ]]; then
-        echo "⏭️  Skipping downloads for $TARGET_DIR (default value detected)"
-        continue
-    fi
-
-    IFS=',' read -ra MODEL_IDS <<< "$MODEL_IDS_STRING"
-
-    for MODEL_ID in "${MODEL_IDS[@]}"; do
-        sleep 1
-        wait_for_slot "$CIVITAI_MAX_PARALLEL" CIVITAI_DOWNLOAD_PIDS
-        echo "🚀 Scheduling download: $MODEL_ID to $TARGET_DIR"
-        (cd "$TARGET_DIR" && download_with_aria.py -m "$MODEL_ID") &
-        CIVITAI_DOWNLOAD_PIDS+=("$!")
-        ((download_count++))
-    done
-done
-
-echo "📋 Scheduled $download_count downloads in background"
-
-# Wait for all downloads to complete
-echo "⏳ Waiting for downloads to complete..."
-if ! wait_for_downloads CIVITAI_DOWNLOAD_PIDS "CivitAI"; then
-    exit 1
-fi
-
-
-echo "✅ All models downloaded successfully!"
-
-echo "All downloads completed!"
-
-echo "Finished downloading models!"
 
 
 echo "Checking and copying workflow..."
@@ -466,12 +467,6 @@ echo "cd $NETWORK_VOLUME" >> ~/.bashrc
 
 echo "✅ Custom node dependency installs complete"
 
-echo "Renaming loras downloaded as zip files to safetensors files"
-cd $LORAS_DIR
-for file in *.zip; do
-    mv "$file" "${file%.zip}.safetensors"
-done
-
 # Wait for SageAttention build to complete
 echo "Waiting for SageAttention build to complete..."
 while ! [ -f /tmp/sage_build_done ]; do
@@ -529,6 +524,12 @@ nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --enable-cors-header '*
     # Only show success message if curl succeeded
     if curl --silent --fail "$URL" --output /dev/null; then
         echo "🚀 ComfyUI is UP"
+        (
+            if ! run_optional_downloads; then
+                echo "⚠️  Optional model and LoRA downloads failed. ComfyUI will continue running."
+            fi
+        ) &
+        echo "📥 Optional model and LoRA downloads started in background (PID: $!)"
     fi
 
     sleep infinity
