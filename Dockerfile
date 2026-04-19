@@ -49,6 +49,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN --mount=type=cache,target=/root/.cache/pip \
     /usr/bin/yes | comfy --workspace /ComfyUI install
 
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -r /ComfyUI/requirements.txt
+
 FROM base AS final
 # Make sure to use the virtual environment here too
 ENV PATH="/opt/venv/bin:$PATH"
