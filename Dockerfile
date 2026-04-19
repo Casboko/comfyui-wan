@@ -40,6 +40,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
         jupyter-server jupyter-server-terminals \
         ipykernel jupyterlab_code_formatter
 
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install "huggingface_hub[hf_transfer]"
+
 # ------------------------------------------------------------
 # ComfyUI install
 # ------------------------------------------------------------

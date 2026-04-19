@@ -150,7 +150,106 @@ export change_preview_method="true"
 # Change to the directory
 cd "$CUSTOM_NODES_DIR" || exit 1
 
-# Function to download a model using huggingface-cli
+export HF_HUB_ENABLE_HF_TRANSFER="${HF_HUB_ENABLE_HF_TRANSFER:-1}"
+MODEL_DOWNLOAD_MAX_PARALLEL="${MODEL_DOWNLOAD_MAX_PARALLEL:-2}"
+CIVITAI_MAX_PARALLEL="${CIVITAI_MAX_PARALLEL:-4}"
+MODEL_DOWNLOAD_PIDS=()
+CIVITAI_DOWNLOAD_PIDS=()
+
+prune_finished_pids() {
+    local -n pid_array="$1"
+    local active_pids=()
+    local pid
+
+    for pid in "${pid_array[@]}"; do
+        if kill -0 "$pid" 2>/dev/null; then
+            active_pids+=("$pid")
+        fi
+    done
+
+    pid_array=("${active_pids[@]}")
+}
+
+wait_for_slot() {
+    local limit="$1"
+    local array_name="$2"
+
+    while true; do
+        prune_finished_pids "$array_name"
+        local -n pid_array="$array_name"
+        if [ "${#pid_array[@]}" -lt "$limit" ]; then
+            break
+        fi
+        sleep 1
+    done
+}
+
+wait_for_downloads() {
+    local array_name="$1"
+    local label="$2"
+    local status=0
+    local pid
+    local -n pid_array="$array_name"
+
+    for pid in "${pid_array[@]}"; do
+        if ! wait "$pid"; then
+            echo "❌ ${label} download failed (PID: $pid)"
+            status=1
+        fi
+    done
+
+    pid_array=()
+    return "$status"
+}
+
+is_huggingface_resolve_url() {
+    local url="$1"
+    [[ "$url" =~ ^https://huggingface\.co/.+/resolve/.+$ ]]
+}
+
+download_model_huggingface() {
+    local url="$1"
+    local destination_dir="$2"
+    local destination_file="$3"
+
+    python - "$url" "$destination_dir" "$destination_file" <<'PY'
+import os
+import shutil
+import sys
+from pathlib import Path
+from urllib.parse import urlparse
+
+from huggingface_hub import hf_hub_download
+
+url, destination_dir, destination_file = sys.argv[1:4]
+parsed = urlparse(url)
+parts = parsed.path.lstrip("/").split("/")
+if len(parts) < 5 or parts[2] != "resolve":
+    raise SystemExit(f"Unsupported Hugging Face resolve URL: {url}")
+
+repo_id = f"{parts[0]}/{parts[1]}"
+filename = "/".join(parts[4:])
+token = (os.environ.get("HF_TOKEN") or "").strip() or None
+destination_dir_path = Path(destination_dir)
+destination_path = destination_dir_path / destination_file
+destination_dir_path.mkdir(parents=True, exist_ok=True)
+
+local_path = Path(
+    hf_hub_download(
+        repo_id=repo_id,
+        filename=filename,
+        local_dir=str(destination_dir_path),
+        token=token,
+    )
+)
+
+if local_path.resolve() != destination_path.resolve():
+    destination_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.move(str(local_path), str(destination_path))
+PY
+}
+
+# Function to download a model using hf_transfer or aria2c
 download_model() {
     local url="$1"
     local full_path="$2"
@@ -183,8 +282,16 @@ download_model() {
 
     echo "📥 Downloading $destination_file to $destination_dir..."
 
-    # Download without falloc (since it's not supported in your environment)
-    aria2c -x 16 -s 16 -k 1M --continue=true -d "$destination_dir" -o "$destination_file" "$url" &
+    wait_for_slot "$MODEL_DOWNLOAD_MAX_PARALLEL" MODEL_DOWNLOAD_PIDS
+
+    if is_huggingface_resolve_url "$url"; then
+        download_model_huggingface "$url" "$destination_dir" "$destination_file" &
+    else
+        # Download without falloc (since it's not supported in your environment)
+        aria2c -x 16 -s 16 -k 1M --continue=true -d "$destination_dir" -o "$destination_file" "$url" &
+    fi
+
+    MODEL_DOWNLOAD_PIDS+=("$!")
 
     echo "Download started in background for $destination_file"
 }
@@ -220,11 +327,10 @@ download_model "https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-
 download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors"
 download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"
 
-# Keep checking until no aria2c processes are running
-while pgrep -x "aria2c" > /dev/null; do
-    echo "🔽 Model Downloads still in progress..."
-    sleep 5  # Check every 5 seconds
-done
+echo "⏳ Waiting for managed model downloads to complete..."
+if ! wait_for_downloads MODEL_DOWNLOAD_PIDS "managed model"; then
+    exit 1
+fi
 
 CHECKPOINT_IDS_TO_DOWNLOAD="${CHECKPOINT_IDS_TO_DOWNLOAD:-replace_with_ids}"
 DEFAULT_LORAS_IDS_TO_DOWNLOAD="2263030,2263094,2293529,2293622,2377549,2377566,2098405,2098396,2245356,2245426,2545249,2545246,2156392,2156435,2169837,2169847,2648813,2648814,2663475,2663487,2377035,2377244,2235299,2235288,2325788,2191446,2441730,2445044,2212384,2212394,2352366,2352388,2445168,2445176,2187729,2187757,2448064,2448070,2272024,2272102,2620366,2622170,2785769,2786571,2510280,2510218,2595899,2595905,2303927,2303966,2308339,2308328,2176450,2178869,2460386,2460428,2197409,2215731,2430424,2430183,2303232,2303184,2438671,2433303,2373814,2373843,2779234,2779292,2516837,2516839"
@@ -255,8 +361,10 @@ for TARGET_DIR in "${!MODEL_CATEGORIES[@]}"; do
 
     for MODEL_ID in "${MODEL_IDS[@]}"; do
         sleep 1
+        wait_for_slot "$CIVITAI_MAX_PARALLEL" CIVITAI_DOWNLOAD_PIDS
         echo "🚀 Scheduling download: $MODEL_ID to $TARGET_DIR"
         (cd "$TARGET_DIR" && download_with_aria.py -m "$MODEL_ID") &
+        CIVITAI_DOWNLOAD_PIDS+=("$!")
         ((download_count++))
     done
 done
@@ -265,10 +373,9 @@ echo "📋 Scheduled $download_count downloads in background"
 
 # Wait for all downloads to complete
 echo "⏳ Waiting for downloads to complete..."
-while pgrep -x "aria2c" > /dev/null; do
-    echo "🔽 LoRA Downloads still in progress..."
-    sleep 5  # Check every 5 seconds
-done
+if ! wait_for_downloads CIVITAI_DOWNLOAD_PIDS "CivitAI"; then
+    exit 1
+fi
 
 
 echo "✅ All models downloaded successfully!"
