@@ -835,7 +835,7 @@ nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --enable-cors-header '*
 
     # Counter for timeout
     counter=0
-    max_wait=70
+    max_wait=300
 
     until curl --silent --fail "$URL" --output /dev/null; do
         if [ $counter -ge $max_wait ]; then
