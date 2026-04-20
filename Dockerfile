@@ -59,9 +59,20 @@ RUN pip install opencv-python
 
 RUN for repo in \
     https://github.com/Artificial-Sweetener/comfyui-WhiteRabbit.git \
+    https://github.com/ashtar1984/comfyui-find-perfect-resolution.git \
+    https://github.com/ClownsharkBatwing/RES4LYF.git \
     https://github.com/Comfy-Org/Nvidia_RTX_Nodes_ComfyUI.git \
     https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git \
     https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git \
+    https://github.com/LDNKS094/ComfyUI-Painter-I2V-AIO.git \
+    https://github.com/StableLlama/ComfyUI-basic_data_handling.git \
+    https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git \
+    https://github.com/WASasquatch/was-node-suite-comfyui.git \
+    https://github.com/filliptm/ComfyUI_Fill-Nodes.git \
+    https://github.com/jamesWalker55/comfyui-various.git \
+    https://github.com/kijai/ComfyUI-Florence2.git \
+    https://github.com/kijai/ComfyUI-GIMM-VFI.git \
+    https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git \
     https://github.com/PGCRT/CRT-Nodes.git \
     https://github.com/Smirnov75/ComfyUI-mxToolkit.git \
     https://github.com/chibiace/ComfyUI-Chibi-Nodes.git \
@@ -72,10 +83,12 @@ RUN for repo in \
     https://github.com/fblissjr/ComfyUI-WanSeamlessFlow.git \
     https://github.com/kijai/ComfyUI-KJNodes.git \
     https://github.com/kijai/ComfyUI-WanVideoWrapper.git \
+    https://github.com/melMass/comfy_mtb.git \
     https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git \
     https://github.com/rgthree/rgthree-comfy.git \
     https://github.com/spacepxl/ComfyUI-Image-Filters.git \
     https://github.com/wallen0322/ComfyUI-Wan22FMLF.git \
+    https://github.com/yuvraj108c/ComfyUI-Upscaler-Tensorrt.git \
     https://github.com/yolain/ComfyUI-Easy-Use.git \
     ; \
     do \
