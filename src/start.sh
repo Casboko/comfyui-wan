@@ -78,9 +78,20 @@ pip install onnxruntime-gpu &
 KJNODES_COMMIT="204f6d5"
 CUSTOM_NODE_REPOS=(
     "https://github.com/Artificial-Sweetener/comfyui-WhiteRabbit.git"
+    "https://github.com/ashtar1984/comfyui-find-perfect-resolution.git"
+    "https://github.com/ClownsharkBatwing/RES4LYF.git"
     "https://github.com/Comfy-Org/Nvidia_RTX_Nodes_ComfyUI.git"
     "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation.git"
     "https://github.com/Kosinkadink/ComfyUI-VideoHelperSuite.git"
+    "https://github.com/LDNKS094/ComfyUI-Painter-I2V-AIO.git"
+    "https://github.com/StableLlama/ComfyUI-basic_data_handling.git"
+    "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git"
+    "https://github.com/WASasquatch/was-node-suite-comfyui.git"
+    "https://github.com/filliptm/ComfyUI_Fill-Nodes.git"
+    "https://github.com/jamesWalker55/comfyui-various.git"
+    "https://github.com/kijai/ComfyUI-Florence2.git"
+    "https://github.com/kijai/ComfyUI-GIMM-VFI.git"
+    "https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git"
     "https://github.com/PGCRT/CRT-Nodes.git"
     "https://github.com/Smirnov75/ComfyUI-mxToolkit.git"
     "https://github.com/chibiace/ComfyUI-Chibi-Nodes.git"
@@ -91,12 +102,29 @@ CUSTOM_NODE_REPOS=(
     "https://github.com/fblissjr/ComfyUI-WanSeamlessFlow.git"
     "https://github.com/kijai/ComfyUI-KJNodes.git"
     "https://github.com/kijai/ComfyUI-WanVideoWrapper.git"
+    "https://github.com/melMass/comfy_mtb.git"
     "https://github.com/pythongosssss/ComfyUI-Custom-Scripts.git"
     "https://github.com/rgthree/rgthree-comfy.git"
     "https://github.com/spacepxl/ComfyUI-Image-Filters.git"
     "https://github.com/wallen0322/ComfyUI-Wan22FMLF.git"
+    "https://github.com/yuvraj108c/ComfyUI-Upscaler-Tensorrt.git"
     "https://github.com/yolain/ComfyUI-Easy-Use.git"
 )
+
+DEPRECATED_CUSTOM_NODE_DIRS=(
+    "ComfyUI-PainterI2Vadvanced"
+)
+
+remove_deprecated_custom_node_dirs() {
+    local node_dir
+
+    for node_dir in "${DEPRECATED_CUSTOM_NODE_DIRS[@]}"; do
+        if [ -d "$CUSTOM_NODES_DIR/$node_dir" ]; then
+            echo "🧹 Removing deprecated custom node: $node_dir"
+            rm -rf "$CUSTOM_NODES_DIR/$node_dir"
+        fi
+    done
+}
 
 sync_custom_node_repo() {
     local repo="$1"
@@ -134,6 +162,8 @@ install_custom_node_deps() {
         python "$repo_path/install.py"
     fi
 }
+
+remove_deprecated_custom_node_dirs
 
 for repo in "${CUSTOM_NODE_REPOS[@]}"; do
     sync_custom_node_repo "$repo"
@@ -269,6 +299,256 @@ if local_path.resolve() != destination_path.resolve():
 PY
 }
 
+download_model_civitai_model_version() {
+    local model_version_id="$1"
+    local full_path="$2"
+
+    local destination_dir
+    destination_dir=$(dirname "$full_path")
+    local destination_file
+    destination_file=$(basename "$full_path")
+
+    mkdir -p "$destination_dir"
+
+    if [ -f "$full_path" ]; then
+        local size_bytes
+        size_bytes=$(stat -f%z "$full_path" 2>/dev/null || stat -c%s "$full_path" 2>/dev/null || echo 0)
+        local size_mb=$((size_bytes / 1024 / 1024))
+
+        if [ "$size_bytes" -lt 10485760 ]; then
+            echo "🗑️  Deleting corrupted file (${size_mb}MB < 10MB): $full_path"
+            rm -f "$full_path"
+        else
+            echo "✅ $destination_file already exists (${size_mb}MB), skipping download."
+            return 0
+        fi
+    fi
+
+    if [ -f "${full_path}.aria2" ]; then
+        echo "🗑️  Deleting .aria2 control file: ${full_path}.aria2"
+        rm -f "${full_path}.aria2"
+        rm -f "$full_path"
+    fi
+
+    echo "📥 Downloading CivitAI model version $model_version_id to $destination_dir/$destination_file..."
+
+    wait_for_slot "$MODEL_DOWNLOAD_MAX_PARALLEL" MODEL_DOWNLOAD_PIDS
+
+    python3 - "$model_version_id" "$destination_dir" "$destination_file" <<'PY' &
+import os
+import subprocess
+import sys
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+import requests
+
+model_version_id, destination_dir, destination_file = sys.argv[1:4]
+token = (os.environ.get("civitai_token") or "").strip()
+headers = {"Authorization": f"Bearer {token}"} if token else {}
+
+
+def append_token(url: str, token_value: str) -> str:
+    if not token_value:
+        return url
+    parsed = urlparse(url)
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    query["token"] = token_value
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
+meta_url = f"https://civitai.com/api/v1/model-versions/{model_version_id}"
+meta_response = requests.get(meta_url, headers=headers, timeout=30)
+meta_response.raise_for_status()
+meta = meta_response.json()
+files = meta.get("files") or []
+if not files:
+    raise SystemExit(f"No files found for CivitAI model version {model_version_id}")
+
+download_url = files[0].get("downloadUrl") or f"https://civitai.com/api/download/models/{model_version_id}"
+download_url = append_token(download_url, token)
+
+redirect_response = requests.get(
+    download_url,
+    headers=headers,
+    allow_redirects=False,
+    timeout=30,
+)
+if redirect_response.status_code not in (301, 302, 303, 307, 308):
+    raise SystemExit(
+        f"Failed to resolve download URL for CivitAI model version {model_version_id}: "
+        f"HTTP {redirect_response.status_code}"
+    )
+
+resolved_url = redirect_response.headers.get("Location")
+if not resolved_url:
+    raise SystemExit(f"Missing redirect location for CivitAI model version {model_version_id}")
+
+os.makedirs(destination_dir, exist_ok=True)
+subprocess.run(
+    [
+        "aria2c",
+        "-x",
+        "16",
+        "-s",
+        "16",
+        "-k",
+        "1M",
+        "--continue=true",
+        "--auto-file-renaming=false",
+        "--allow-overwrite=true",
+        "-d",
+        destination_dir,
+        "-o",
+        destination_file,
+        resolved_url,
+    ],
+    check=True,
+)
+PY
+
+    MODEL_DOWNLOAD_PIDS+=("$!")
+
+    echo "Download started in background for $destination_file"
+}
+
+download_and_extract_civitai_archive_model_version() {
+    local model_version_id="$1"
+    local destination_dir="$2"
+    local extract_subdir="$3"
+    local extract_path="$destination_dir/$extract_subdir"
+    local completion_marker="$extract_path/.civitai-model-version-${model_version_id}.complete"
+
+    mkdir -p "$destination_dir"
+
+    if [ -f "$completion_marker" ]; then
+        echo "✅ CivitAI archive $model_version_id already extracted, skipping: $extract_path"
+        return 0
+    fi
+
+    if [ -d "$extract_path" ]; then
+        echo "🧹 Removing incomplete CivitAI archive extraction: $extract_path"
+        rm -rf "$extract_path"
+    fi
+
+    echo "📦 Downloading and extracting CivitAI archive model version $model_version_id to $extract_path..."
+
+    wait_for_slot "$MODEL_DOWNLOAD_MAX_PARALLEL" MODEL_DOWNLOAD_PIDS
+
+    python3 - "$model_version_id" "$destination_dir" "$extract_subdir" <<'PY' &
+import json
+import os
+import shutil
+import sys
+import tempfile
+import zipfile
+from pathlib import Path
+from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
+import requests
+
+model_version_id, destination_dir, extract_subdir = sys.argv[1:4]
+token = (os.environ.get("civitai_token") or "").strip()
+headers = {"Authorization": f"Bearer {token}"} if token else {}
+
+
+def append_token(url: str, token_value: str) -> str:
+    if not token_value:
+        return url
+    parsed = urlparse(url)
+    query = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    query["token"] = token_value
+    return urlunparse(parsed._replace(query=urlencode(query)))
+
+
+def safe_extract(zf: zipfile.ZipFile, target_dir: Path) -> None:
+    target_root = target_dir.resolve()
+    for member in zf.infolist():
+        member_target = (target_dir / member.filename).resolve()
+        if member_target != target_root and target_root not in member_target.parents:
+            raise SystemExit(f"Refusing to extract archive entry outside target dir: {member.filename}")
+    zf.extractall(target_dir)
+
+
+meta_url = f"https://civitai.com/api/v1/model-versions/{model_version_id}"
+meta_response = requests.get(meta_url, headers=headers, timeout=30)
+meta_response.raise_for_status()
+meta = meta_response.json()
+files = meta.get("files") or []
+if not files:
+    raise SystemExit(f"No files found for CivitAI model version {model_version_id}")
+
+archive_file = next((f for f in files if (f.get("type") or "").lower() == "model"), files[0])
+archive_name = archive_file.get("name") or f"{model_version_id}.zip"
+if not archive_name.lower().endswith(".zip"):
+    raise SystemExit(
+        f"CivitAI model version {model_version_id} is not a zip archive: {archive_name}"
+    )
+
+download_url = archive_file.get("downloadUrl") or f"https://civitai.com/api/download/models/{model_version_id}"
+download_url = append_token(download_url, token)
+
+destination_root = (Path(destination_dir) / extract_subdir).resolve()
+marker_path = destination_root / f".civitai-model-version-{model_version_id}.complete"
+
+with tempfile.TemporaryDirectory(prefix=f"civitai-{model_version_id}-", dir=destination_dir) as temp_dir:
+    temp_path = Path(temp_dir)
+    archive_path = temp_path / archive_name
+
+    with requests.get(
+        download_url,
+        headers=headers,
+        stream=True,
+        allow_redirects=True,
+        timeout=(30, 300),
+    ) as response:
+        response.raise_for_status()
+        with archive_path.open("wb") as handle:
+            for chunk in response.iter_content(chunk_size=4 * 1024 * 1024):
+                if chunk:
+                    handle.write(chunk)
+
+    if archive_path.stat().st_size < 10 * 1024 * 1024:
+        raise SystemExit(
+            f"Downloaded archive for CivitAI model version {model_version_id} looks too small: "
+            f"{archive_path.stat().st_size} bytes"
+        )
+
+    if destination_root.exists():
+        shutil.rmtree(destination_root)
+    destination_root.mkdir(parents=True, exist_ok=True)
+
+    with zipfile.ZipFile(archive_path) as archive:
+        safe_extract(archive, destination_root)
+
+    extracted_model_files = sorted(
+        str(path.relative_to(destination_root))
+        for path in destination_root.rglob("*")
+        if path.is_file() and path.suffix.lower() in {".safetensors", ".gguf", ".pth", ".pt", ".bin"}
+    )
+    if not extracted_model_files:
+        raise SystemExit(
+            f"No model files were found after extracting CivitAI model version {model_version_id}"
+        )
+
+    marker_path.write_text(
+        json.dumps(
+            {
+                "model_version_id": model_version_id,
+                "archive_name": archive_name,
+                "files": extracted_model_files,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+PY
+
+    MODEL_DOWNLOAD_PIDS+=("$!")
+
+    echo "Archive download started in background for CivitAI model version $model_version_id"
+}
+
 # Function to download a model using hf_transfer or aria2c
 download_model() {
     local url="$1"
@@ -317,18 +597,32 @@ download_model() {
 }
 
 run_optional_downloads() {
+    ensure_model_alias \
+        "/comfyui-wan/4xLSDIR.pth" \
+        "$UPSCALE_MODELS_DIR/4xLSDIR.pth" || true
+
     echo "Downloading managed Hugging Face / direct URL models..."
     download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_high_noise_14B_fp16.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_high_noise_14B_fp16.safetensors"
     download_model "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/diffusion_models/wan2.2_i2v_low_noise_14B_fp16.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_low_noise_14B_fp16.safetensors"
     download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_high_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_A14b_high_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors"
     download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_low_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors" "$DIFFUSION_MODELS_DIR/wan2.2_i2v_A14b_low_noise_scaled_fp8_e4m3_lightx2v_4step_comfyui_720p_260412.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.1-Distill-Models/resolve/main/wan2.1_i2v_480p_scaled_fp8_e4m3_lightx2v_4step_comfyui.safetensors" "$DIFFUSION_MODELS_DIR/wan2.1_i2v_480p_scaled_fp8_e4m3_lightx2v_4step_comfyui.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.1-Distill-Models/resolve/main/wan2.1_i2v_720p_scaled_fp8_e4m3_lightx2v_4step_comfyui.safetensors" "$DIFFUSION_MODELS_DIR/wan2.1_i2v_720p_scaled_fp8_e4m3_lightx2v_4step_comfyui.safetensors"
     download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" "$TEXT_ENCODERS_DIR/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5-xxl-enc-bf16.safetensors" "$TEXT_ENCODERS_DIR/umt5-xxl-enc-bf16.safetensors"
+    download_model "https://huggingface.co/NSFW-API/NSFW-Wan-UMT5-XXL/resolve/main/nsfw_wan_umt5-xxl_fp8_scaled.safetensors" "$TEXT_ENCODERS_DIR/nsfw_wan_umt5-xxl_fp8_scaled.safetensors"
+    download_model "https://huggingface.co/zootkitty/nsfw_wan_umt5-xxl_bf16_fixed/resolve/main/nsfw_wan_umt5-xxl_bf16_fixed.safetensors" "$TEXT_ENCODERS_DIR/nsfw_wan_umt5-xxl_bf16_fixed.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors" "$TEXT_ENCODERS_DIR/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors"
     download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" "$CLIP_VISION_DIR/clip_vision_h.safetensors"
     download_model "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors" "$VAE_DIR/wan_2.1_vae.safetensors"
     download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors"
     download_model "https://huggingface.co/obsxrver/wan2.2-i2v-lightx2v-260412/resolve/main/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_720p_260412.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_high_noise_lora_rank64_lightx2v_4step_1022.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.2-Distill-Loras/resolve/main/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors" "$LORAS_DIR/wan2.2_i2v_A14b_low_noise_lora_rank64_lightx2v_4step_1022.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.2-Lightning/resolve/main/Wan2.2-I2V-A14B-4steps-lora-rank64-Seko-V1/high_noise_model.safetensors" "$LORAS_DIR/Wan2.2-Lightning/Wan2.2-I2V-A14B-4steps-lora-rank64-Seko-V1/high_noise_model.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.2-Lightning/resolve/main/Wan2.2-I2V-A14B-4steps-lora-rank64-Seko-V1/low_noise_model.safetensors" "$LORAS_DIR/Wan2.2-Lightning/Wan2.2-I2V-A14B-4steps-lora-rank64-Seko-V1/low_noise_model.safetensors"
+    download_model "https://huggingface.co/lightx2v/Wan2.1-Distill-Loras/resolve/main/wan2.1_i2v_lora_rank64_lightx2v_4step.safetensors" "$LORAS_DIR/wan2.1_i2v_lora_rank64_lightx2v_4step.safetensors"
+    download_and_extract_civitai_archive_model_version "2174159" "$LORAS_DIR" "CivitAI/wan22-2d-animation-effects-2d"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors" "$LORAS_DIR/lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_HIGH_lightx2v_4step_lora_260412_rank_64_fp16.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Wan22_Lightx2v/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors" "$LORAS_DIR/Wan_2_2_I2V_A14B_LOW_lightx2v_4step_lora_260412_rank_64_fp16.safetensors"
@@ -339,6 +633,17 @@ run_optional_downloads() {
     download_model "https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v/resolve/main/loras/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors" "$LORAS_DIR/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"
+    download_model_civitai_model_version "2540892" "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8H.gguf"
+    download_model_civitai_model_version "2540896" "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8L.gguf"
+
+    # Existing workflows already reference rife49.pth, so prefetch it at pod startup.
+    download_model "https://huggingface.co/marduk191/rife/resolve/main/rife49.pth" "$CUSTOM_NODES_DIR/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
+
+    # SeedVR2 is the current high-quality video upscaling option with both
+    # a quality-first FP16 preset and a lower-VRAM Q8 GGUF preset.
+    download_model "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/seedvr2_ema_3b_fp16.safetensors" "$SEEDVR2_MODELS_DIR/seedvr2_ema_3b_fp16.safetensors"
+    download_model "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/seedvr2_ema_3b-Q8_0.gguf" "$SEEDVR2_MODELS_DIR/seedvr2_ema_3b-Q8_0.gguf"
+    download_model "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/ema_vae_fp16.safetensors" "$SEEDVR2_MODELS_DIR/ema_vae_fp16.safetensors"
 
     echo "⏳ Waiting for managed model downloads to complete..."
     if ! wait_for_downloads MODEL_DOWNLOAD_PIDS "managed model"; then
@@ -350,7 +655,12 @@ run_optional_downloads() {
         "$CLIP_VISION_DIR/open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors"
 
     CHECKPOINT_IDS_TO_DOWNLOAD="${CHECKPOINT_IDS_TO_DOWNLOAD:-replace_with_ids}"
+
     DEFAULT_LORAS_IDS_TO_DOWNLOAD="2263030,2263094,2293529,2293622,2250571,2250590,2377549,2377566,2098405,2098396,2245356,2245426,2545249,2545246,2156392,2156435,2169837,2169847,2648813,2648814,2663475,2663487,2377035,2377244,2235299,2235288,2325788,2191446,2441730,2445044,2212384,2212394,2352366,2352388,2445168,2445176,2187729,2187757,2448064,2448070,2272024,2272102,2620366,2622170,2785769,2786571,2510280,2510218,2595899,2595905,2303927,2303966,2308249,2308253,2308339,2308328,2176450,2178869,2460386,2460428,2197409,2215731,2430424,2430183,2303232,2303184,2438671,2433303,2373814,2373843,2779234,2779292,2516837,2516839"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2073605,2083303,2343934,2344329,2251804,2251839,2239947,2239942,2191786,2191798"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2718460,2722289,2426143,2426138,2116008,2116027,2579567,2579518,2631919,2631948"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2484657,2538990,2632191,2632200,2212521,2212510,2207480,2207776,2254373,2254403"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2477983,2477975,2161023,2161067,2342652,2342660,2332735,2332853,2246694,2246669"
     if [ -z "${LORAS_IDS_TO_DOWNLOAD:-}" ] || [ "$LORAS_IDS_TO_DOWNLOAD" = "replace_with_ids" ]; then
         LORAS_IDS_TO_DOWNLOAD="$DEFAULT_LORAS_IDS_TO_DOWNLOAD"
     fi
@@ -408,6 +718,9 @@ CLIP_VISION_DIR="$NETWORK_VOLUME/ComfyUI/models/clip_vision"
 VAE_DIR="$NETWORK_VOLUME/ComfyUI/models/vae"
 LORAS_DIR="$NETWORK_VOLUME/ComfyUI/models/loras"
 DETECTION_DIR="$NETWORK_VOLUME/ComfyUI/models/detection"
+UNET_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/unet"
+UPSCALE_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/upscale_models"
+SEEDVR2_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/SEEDVR2"
 
 
 echo "Checking and copying workflow..."
@@ -522,7 +835,7 @@ nohup python3 "$NETWORK_VOLUME/ComfyUI/main.py" --listen --enable-cors-header '*
 
     # Counter for timeout
     counter=0
-    max_wait=70
+    max_wait=300
 
     until curl --silent --fail "$URL" --output /dev/null; do
         if [ $counter -ge $max_wait ]; then

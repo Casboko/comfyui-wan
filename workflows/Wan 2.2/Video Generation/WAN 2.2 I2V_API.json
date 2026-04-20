@@ -1,0 +1,815 @@
+{
+  "11": {
+    "inputs": {
+      "model_name": "umt5-xxl-enc-bf16.safetensors",
+      "precision": "bf16",
+      "load_device": "main_device",
+      "quantization": "disabled"
+    },
+    "class_type": "LoadWanVideoT5TextEncoder",
+    "_meta": {
+      "title": "WanVideo T5 Text Encoder Loader"
+    }
+  },
+  "16": {
+    "inputs": {
+      "positive_prompt": [
+        "59",
+        0
+      ],
+      "negative_prompt": "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，多余的脚趾，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走，马赛克，卡通崩坏，绘制错误，线条错乱，涂鸦感，CG感过强，塑料质感，AI感太强，动作僵硬，木偶般的动作，呆板的姿势，缺乏动态感，假笑，面部僵硬，表情呆滞，动态丢失，动画感缺失，低帧率感，动作撕裂，残影异常，身体卡顿，头身比例怪异，眼睛模糊，五官错位，重复的身体部位，肢体缺失，塌陷的皮肤，透视背景错误，光影不合理，场景违和，衣服凭空消失，不连贯的衣服，畸形嘴唇，突变嘴唇，画得不好的嘴唇，畸形嘴巴，突变嘴巴，画得不好的嘴巴，多余的牙齿，缺失的牙齿，不对称嘴唇，不自然的口红，口红涂抹模糊，不连贯的嘴唇，画得不好的脚，突变的脚，畸形的脚，深色嘴唇，深色口红，红色口红，红色嘴唇，畸形的脸，突变的脸，画得不好的脸，脸部变形，多张脸，脸型不一致，人物身份变化，脸部模糊，面部闪烁，畸变手部，突变手部，多余的手部，肢体穿模，畸变眼睛，突变眼睛，画得不好的眼睛，眼睛不一致，像素化, 锯齿, 粗糙边缘, 锯齿边缘, 伪影, 噪点, 模糊线条, 扭曲细节, 锐边, 线条抖动, 失焦, 低分辨率, 错误纹理，真实睫毛，现实睫毛",
+      "force_offload": true,
+      "use_disk_cache": true,
+      "device": "gpu"
+    },
+    "class_type": "WanVideoTextEncode",
+    "_meta": {
+      "title": "WanVideo TextEncode"
+    }
+  },
+  "28": {
+    "inputs": {
+      "enable_vae_tiling": false,
+      "tile_x": 512,
+      "tile_y": 512,
+      "tile_stride_x": 256,
+      "tile_stride_y": 256,
+      "normalization": "default",
+      "samples": [
+        "392",
+        1
+      ]
+    },
+    "class_type": "WanVideoDecode",
+    "_meta": {
+      "title": "WanVideo Decode"
+    }
+  },
+  "30": {
+    "inputs": {
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "/vol/out/WAN22/20260416/preview/w832x480/s0",
+      "format": "video/h264-mp4",
+      "pix_fmt": "yuv420p",
+      "crf": 19,
+      "save_metadata": true,
+      "trim_to_audio": false,
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "28",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "Preview"
+    }
+  },
+  "38": {
+    "inputs": {
+      "model_name": "wan_2.1_vae.safetensors",
+      "precision": "fp32",
+      "use_cpu_cache": false,
+      "verbose": false
+    },
+    "class_type": "WanVideoVAELoader",
+    "_meta": {
+      "title": "WanVideo VAE Loader"
+    }
+  },
+  "55": {
+    "inputs": {
+      "weight": 2.0000000000000004,
+      "start_percent": 0,
+      "end_percent": 1
+    },
+    "class_type": "WanVideoEnhanceAVideo",
+    "_meta": {
+      "title": "WanVideo Enhance-A-Video"
+    }
+  },
+  "57": {
+    "inputs": {
+      "anything": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "Anything Everywhere"
+    }
+  },
+  "59": {
+    "inputs": {
+      "text": ""
+    },
+    "class_type": "Textbox",
+    "_meta": {
+      "title": "Prompt"
+    }
+  },
+  "226": {
+    "inputs": {
+      "anything67": [
+        "576",
+        0
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "Anything Everywhere"
+    }
+  },
+  "229": {
+    "inputs": {
+      "anything": [
+        "55",
+        0
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "Anything Everywhere"
+    }
+  },
+  "230": {
+    "inputs": {
+      "anything": [
+        "11",
+        0
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "Anything Everywhere"
+    }
+  },
+  "392": {
+    "inputs": {
+      "steps": [
+        "440",
+        0
+      ],
+      "cfg": 1.0000000000000002,
+      "shift": 5.000000000000001,
+      "seed": 0,
+      "force_offload": true,
+      "scheduler": "euler/beta",
+      "riflex_freq_index": 0,
+      "denoise_strength": 1,
+      "batched_cfg": false,
+      "rope_function": "comfy",
+      "start_step": [
+        "488",
+        0
+      ],
+      "end_step": -1,
+      "add_noise_to_samples": false,
+      "model": [
+        "468",
+        0
+      ],
+      "samples": [
+        "505",
+        0
+      ],
+      "context_options": [
+        "541",
+        0
+      ]
+    },
+    "class_type": "WanVideoSampler",
+    "_meta": {
+      "title": "WanVideo Sampler"
+    }
+  },
+  "398": {
+    "inputs": {
+      "anything66": [
+        "432",
+        0
+      ]
+    },
+    "class_type": "Anything Everywhere",
+    "_meta": {
+      "title": "Anything Everywhere"
+    }
+  },
+  "432": {
+    "inputs": {
+      "width": [
+        "489",
+        1
+      ],
+      "height": [
+        "489",
+        2
+      ],
+      "num_frames": [
+        "439",
+        0
+      ],
+      "noise_aug_strength": 0.3,
+      "start_latent_strength": 0.95,
+      "end_latent_strength": 1.0000000000000002,
+      "force_offload": false,
+      "fun_or_fl2v_model": false,
+      "tiled_vae": false,
+      "augment_empty_frames": 0,
+      "clip_embeds": [
+        "580",
+        0
+      ],
+      "start_image": [
+        "489",
+        0
+      ]
+    },
+    "class_type": "WanVideoImageToVideoEncode",
+    "_meta": {
+      "title": "WanVideo ImageToVideo Encode"
+    }
+  },
+  "433": {
+    "inputs": {
+      "image": "1boy, kagamine len, solo, 1.0__from side__, 1.0__cowboy shot__, 1.5__feet out of s-2909603579.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "画像を読み込む"
+    }
+  },
+  "439": {
+    "inputs": {
+      "Xi": 257,
+      "Xf": 257,
+      "isfloatX": 0
+    },
+    "class_type": "mxSlider",
+    "_meta": {
+      "title": "Desired Frame Count"
+    }
+  },
+  "440": {
+    "inputs": {
+      "Xi": 6,
+      "Xf": 6,
+      "isfloatX": 0
+    },
+    "class_type": "mxSlider",
+    "_meta": {
+      "title": "Desired STEPS"
+    }
+  },
+  "443": {
+    "inputs": {
+      "divisor": 2,
+      "float": 0,
+      "int": [
+        "440",
+        0
+      ]
+    },
+    "class_type": "Divide [DVB]",
+    "_meta": {
+      "title": "÷ Divide"
+    }
+  },
+  "464": {
+    "inputs": {
+      "model": [
+        "621",
+        0
+      ],
+      "block_swap_args": [
+        "474",
+        0
+      ]
+    },
+    "class_type": "WanVideoSetBlockSwap",
+    "_meta": {
+      "title": "WanVideo Set BlockSwap"
+    }
+  },
+  "466": {
+    "inputs": {
+      "model": [
+        "464",
+        0
+      ],
+      "lora": [
+        "620",
+        0
+      ]
+    },
+    "class_type": "WanVideoSetLoRAs",
+    "_meta": {
+      "title": "WanVideo Set LoRAs"
+    }
+  },
+  "467": {
+    "inputs": {
+      "model": [
+        "622",
+        0
+      ],
+      "block_swap_args": [
+        "474",
+        0
+      ]
+    },
+    "class_type": "WanVideoSetBlockSwap",
+    "_meta": {
+      "title": "WanVideo Set BlockSwap"
+    }
+  },
+  "468": {
+    "inputs": {
+      "model": [
+        "467",
+        0
+      ],
+      "lora": [
+        "619",
+        0
+      ]
+    },
+    "class_type": "WanVideoSetLoRAs",
+    "_meta": {
+      "title": "WanVideo Set LoRAs"
+    }
+  },
+  "474": {
+    "inputs": {
+      "blocks_to_swap": 0,
+      "offload_img_emb": false,
+      "offload_txt_emb": false,
+      "use_non_blocking": true,
+      "vace_blocks_to_swap": 0,
+      "prefetch_blocks": 0,
+      "block_swap_debug": false
+    },
+    "class_type": "WanVideoBlockSwap",
+    "_meta": {
+      "title": "WanVideo Block Swap"
+    }
+  },
+  "475": {
+    "inputs": {
+      "backend": "inductor",
+      "fullgraph": false,
+      "mode": "default",
+      "dynamic": false,
+      "dynamo_cache_size_limit": 64,
+      "compile_transformer_blocks_only": true,
+      "dynamo_recompile_limit": 128,
+      "force_parameter_static_shapes": true,
+      "allow_unmerged_lora_compile": false
+    },
+    "class_type": "WanVideoTorchCompileSettings",
+    "_meta": {
+      "title": "WanVideo Torch Compile Settings"
+    }
+  },
+  "486": {
+    "inputs": {
+      "Xi": 1024,
+      "Xf": 1024,
+      "isfloatX": 0
+    },
+    "class_type": "mxSlider",
+    "_meta": {
+      "title": "Desired Resolution"
+    }
+  },
+  "488": {
+    "inputs": {
+      "sigma": 0.72
+    },
+    "class_type": "WanVideoSigmaToStep",
+    "_meta": {
+      "title": "WanVideo Sigma To Step"
+    }
+  },
+  "489": {
+    "inputs": {
+      "max_side_length": [
+        "486",
+        0
+      ],
+      "image": [
+        "433",
+        0
+      ]
+    },
+    "class_type": "CRT_QuantizeAndCropImage",
+    "_meta": {
+      "title": "Desired Resolution"
+    }
+  },
+  "496": {
+    "inputs": {
+      "mode": "always",
+      "volume": 0.5,
+      "file": "notify.mp3",
+      "any": [
+        "525",
+        0
+      ]
+    },
+    "class_type": "PlaySound|pysssss",
+    "_meta": {
+      "title": "PlaySound 🐍"
+    }
+  },
+  "505": {
+    "inputs": {
+      "steps": [
+        "440",
+        0
+      ],
+      "cfg": 1.0000000000000002,
+      "shift": 5.000000000000001,
+      "seed": 85050667222482,
+      "force_offload": true,
+      "scheduler": "euler/beta",
+      "riflex_freq_index": 0,
+      "denoise_strength": 1,
+      "batched_cfg": false,
+      "rope_function": "comfy",
+      "start_step": 0,
+      "end_step": [
+        "488",
+        0
+      ],
+      "add_noise_to_samples": false,
+      "model": [
+        "466",
+        0
+      ],
+      "context_options": [
+        "541",
+        0
+      ]
+    },
+    "class_type": "WanVideoSampler",
+    "_meta": {
+      "title": "WanVideo Sampler"
+    }
+  },
+  "513": {
+    "inputs": {
+      "method": "hm-mvgd-hm",
+      "strength": 0.6000000000000001,
+      "multithread": true,
+      "image_ref": [
+        "599",
+        0
+      ],
+      "image_target": [
+        "615",
+        0
+      ]
+    },
+    "class_type": "ColorMatch",
+    "_meta": {
+      "title": "Color Match"
+    }
+  },
+  "525": {
+    "inputs": {
+      "frame_rate": 16,
+      "loop_count": 0,
+      "filename_prefix": "/vol/out/WAN22/20260416/HH0430_i2v_w832x480_fps16_s0",
+      "format": "video/prores422-mov",
+      "pingpong": false,
+      "save_output": true,
+      "images": [
+        "513",
+        0
+      ]
+    },
+    "class_type": "VHS_VideoCombine",
+    "_meta": {
+      "title": "Combine"
+    }
+  },
+  "534": {
+    "inputs": {
+      "factor": 1,
+      "images": [
+        "538",
+        0
+      ]
+    },
+    "class_type": "BatchNormalizeImage",
+    "_meta": {
+      "title": "Batch Normalize (Image)"
+    }
+  },
+  "536": {
+    "inputs": {
+      "images": [
+        "534",
+        0
+      ]
+    },
+    "class_type": "VHS_GetImageCount",
+    "_meta": {
+      "title": "Get Image Count 🎥🅥🅗🅢"
+    }
+  },
+  "537": {
+    "inputs": {
+      "multiply_by": [
+        "536",
+        0
+      ],
+      "images": [
+        "597",
+        0
+      ]
+    },
+    "class_type": "VHS_DuplicateImages",
+    "_meta": {
+      "title": "Repeat Images 🎥🅥🅗🅢"
+    }
+  },
+  "538": {
+    "inputs": {
+      "device": "gpu",
+      "image": [
+        "28",
+        0
+      ]
+    },
+    "class_type": "ImageToDevice+",
+    "_meta": {
+      "title": "🔧 Image To Device"
+    }
+  },
+  "539": {
+    "inputs": {
+      "factor": 1,
+      "images": [
+        "534",
+        0
+      ],
+      "reference": [
+        "537",
+        0
+      ]
+    },
+    "class_type": "AdainImage",
+    "_meta": {
+      "title": "AdaIN (Image)"
+    }
+  },
+  "541": {
+    "inputs": {
+      "context_schedule": "uniform_looped",
+      "context_frames": 85,
+      "context_stride": 4,
+      "context_overlap": 36,
+      "freenoise": true,
+      "verbose": true,
+      "fuse_method": "pyramid"
+    },
+    "class_type": "WanVideoContextOptions",
+    "_meta": {
+      "title": "WanVideo Context Options"
+    }
+  },
+  "569": {
+    "inputs": {
+      "blend_width": 16,
+      "blend_method": "linear",
+      "normalization": "pad_truncate",
+      "optimize_order": false,
+      "verbosity": 1,
+      "text_embeds": [
+        "16",
+        0
+      ]
+    },
+    "class_type": "WanSmartBlend",
+    "_meta": {
+      "title": "Wan Smart Blend"
+    }
+  },
+  "576": {
+    "inputs": {
+      "analysis_points": 4,
+      "first_pass_steps": 24,
+      "bridge_mode": "Content-focused",
+      "bridge_count": 1,
+      "bridge_strength": 0.75,
+      "lighting_weight": 0.8,
+      "content_weight": 0.7,
+      "composition_weight": 0.6,
+      "save_first_pass": true,
+      "original_prompts": "",
+      "text_embeds": [
+        "569",
+        0
+      ],
+      "clip_vision": [
+        "577",
+        0
+      ]
+    },
+    "class_type": "WanAdaptiveFlow",
+    "_meta": {
+      "title": "Wan Adaptive Flow"
+    }
+  },
+  "577": {
+    "inputs": {
+      "model_name": "open-clip-xlm-roberta-large-vit-huge-14_visual_fp16.safetensors",
+      "precision": "fp32",
+      "load_device": "main_device"
+    },
+    "class_type": "LoadWanVideoClipTextEncoder",
+    "_meta": {
+      "title": "WanVideo CLIP Text Encoder Loader"
+    }
+  },
+  "578": {
+    "inputs": {
+      "text_0": "Created transitions using embedding interpolation (no initial pass)",
+      "text": [
+        "576",
+        1
+      ]
+    },
+    "class_type": "ShowText|pysssss",
+    "_meta": {
+      "title": "Show Text 🐍"
+    }
+  },
+  "580": {
+    "inputs": {
+      "strength_1": 1,
+      "strength_2": 1,
+      "crop": "disabled",
+      "combine_embeds": "average",
+      "force_offload": false,
+      "tiles": 16,
+      "ratio": 0.36,
+      "clip_vision": [
+        "577",
+        0
+      ],
+      "image_1": [
+        "489",
+        0
+      ]
+    },
+    "class_type": "WanVideoClipVisionEncode",
+    "_meta": {
+      "title": "WanVideo ClipVision Encode"
+    }
+  },
+  "597": {
+    "inputs": {
+      "indexes": "0",
+      "images": [
+        "538",
+        0
+      ]
+    },
+    "class_type": "GetImagesFromBatchIndexed",
+    "_meta": {
+      "title": "Get Images From Batch Indexed"
+    }
+  },
+  "599": {
+    "inputs": {
+      "device": "cpu",
+      "image": [
+        "537",
+        0
+      ]
+    },
+    "class_type": "ImageToDevice+",
+    "_meta": {
+      "title": "🔧 Image To Device"
+    }
+  },
+  "615": {
+    "inputs": {
+      "device": "cpu",
+      "image": [
+        "539",
+        0
+      ]
+    },
+    "class_type": "ImageToDevice+",
+    "_meta": {
+      "title": "🔧 Image To Device"
+    }
+  },
+  "617": {
+    "inputs": {
+      "anything": [
+        "496",
+        0
+      ]
+    },
+    "class_type": "easy cleanGpuUsed",
+    "_meta": {
+      "title": "Clean VRAM Used"
+    }
+  },
+  "618": {
+    "inputs": {
+      "anything": [
+        "496",
+        0
+      ]
+    },
+    "class_type": "easy clearCacheAll",
+    "_meta": {
+      "title": "Clear Cache All"
+    }
+  },
+  "619": {
+    "inputs": {
+      "lora_0": "none",
+      "strength_0": 1,
+      "lora_1": "none",
+      "strength_1": 1,
+      "lora_2": "none",
+      "strength_2": 1,
+      "lora_3": "none",
+      "strength_3": 1,
+      "lora_4": "none",
+      "strength_4": 1,
+      "low_mem_load": false,
+      "merge_loras": true
+    },
+    "class_type": "WanVideoLoraSelectMulti",
+    "_meta": {
+      "title": "WanVideo Lora Select Multi"
+    }
+  },
+  "620": {
+    "inputs": {
+      "lora_0": "none",
+      "strength_0": 1,
+      "lora_1": "none",
+      "strength_1": 1,
+      "lora_2": "none",
+      "strength_2": 1,
+      "lora_3": "none",
+      "strength_3": 1,
+      "lora_4": "none",
+      "strength_4": 1,
+      "low_mem_load": false,
+      "merge_loras": true
+    },
+    "class_type": "WanVideoLoraSelectMulti",
+    "_meta": {
+      "title": "WanVideo Lora Select Multi"
+    }
+  },
+  "621": {
+    "inputs": {
+      "model": "Wan2_1-InfiniTetalk-Single_fp16.safetensors",
+      "base_precision": "bf16",
+      "quantization": "disabled",
+      "load_device": "offload_device",
+      "attention_mode": "sdpa",
+      "rms_norm_function": "default",
+      "compile_args": [
+        "475",
+        0
+      ]
+    },
+    "class_type": "WanVideoModelLoader",
+    "_meta": {
+      "title": "WanVideo Model Loader"
+    }
+  },
+  "622": {
+    "inputs": {
+      "model": "Wan2_1-InfiniTetalk-Single_fp16.safetensors",
+      "base_precision": "bf16",
+      "quantization": "disabled",
+      "load_device": "offload_device",
+      "attention_mode": "sdpa",
+      "rms_norm_function": "default",
+      "compile_args": [
+        "475",
+        0
+      ]
+    },
+    "class_type": "WanVideoModelLoader",
+    "_meta": {
+      "title": "WanVideo Model Loader"
+    }
+  }
+}
