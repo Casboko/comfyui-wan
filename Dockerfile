@@ -68,7 +68,10 @@ RUN for repo in \
     https://github.com/StableLlama/ComfyUI-basic_data_handling.git \
     https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git \
     https://github.com/WASasquatch/was-node-suite-comfyui.git \
+    https://github.com/Well-Made/ComfyUI-Wan-SVI2Pro-FLF.git \
+    https://github.com/chflame163/ComfyUI_LayerStyle.git \
     https://github.com/filliptm/ComfyUI_Fill-Nodes.git \
+    https://github.com/evanspearman/ComfyMath.git \
     https://github.com/jamesWalker55/comfyui-various.git \
     https://github.com/kijai/ComfyUI-Florence2.git \
     https://github.com/kijai/ComfyUI-GIMM-VFI.git \

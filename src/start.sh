@@ -87,7 +87,10 @@ CUSTOM_NODE_REPOS=(
     "https://github.com/StableLlama/ComfyUI-basic_data_handling.git"
     "https://github.com/Suzie1/ComfyUI_Comfyroll_CustomNodes.git"
     "https://github.com/WASasquatch/was-node-suite-comfyui.git"
+    "https://github.com/Well-Made/ComfyUI-Wan-SVI2Pro-FLF.git"
+    "https://github.com/chflame163/ComfyUI_LayerStyle.git"
     "https://github.com/filliptm/ComfyUI_Fill-Nodes.git"
+    "https://github.com/evanspearman/ComfyMath.git"
     "https://github.com/jamesWalker55/comfyui-various.git"
     "https://github.com/kijai/ComfyUI-Florence2.git"
     "https://github.com/kijai/ComfyUI-GIMM-VFI.git"
@@ -633,8 +636,6 @@ run_optional_downloads() {
     download_model "https://huggingface.co/lightx2v/Wan2.1-I2V-14B-480P-StepDistill-CfgDistill-Lightx2v/resolve/main/loras/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors" "$LORAS_DIR/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors"
     download_model "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors" "$LORAS_DIR/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"
-    download_model_civitai_model_version "2540892" "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8H.gguf"
-    download_model_civitai_model_version "2540896" "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8L.gguf"
 
     # Existing workflows already reference rife49.pth, so prefetch it at pod startup.
     download_model "https://huggingface.co/marduk191/rife/resolve/main/rife49.pth" "$CUSTOM_NODES_DIR/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
@@ -661,6 +662,9 @@ run_optional_downloads() {
     DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2718460,2722289,2426143,2426138,2116008,2116027,2579567,2579518,2631919,2631948"
     DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2484657,2538990,2632191,2632200,2212521,2212510,2207480,2207776,2254373,2254403"
     DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2477983,2477975,2161023,2161067,2342652,2342660,2332735,2332853,2246694,2246669"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2216775"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2118352"
+    DEFAULT_LORAS_IDS_TO_DOWNLOAD+=",2321568,2321574,2321617,2321645,2321540,2321551,2321588,2321592,2321596,2321608,2321658,2321664,2190121,2190113"
     if [ -z "${LORAS_IDS_TO_DOWNLOAD:-}" ] || [ "$LORAS_IDS_TO_DOWNLOAD" = "replace_with_ids" ]; then
         LORAS_IDS_TO_DOWNLOAD="$DEFAULT_LORAS_IDS_TO_DOWNLOAD"
     fi
@@ -722,6 +726,25 @@ UNET_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/unet"
 UPSCALE_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/upscale_models"
 SEEDVR2_MODELS_DIR="$NETWORK_VOLUME/ComfyUI/models/SEEDVR2"
 
+DEPRECATED_MODEL_FILES=(
+    "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8H.gguf"
+    "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8H.gguf.aria2"
+    "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8L.gguf"
+    "$UNET_MODELS_DIR/wan22EnhancedNSFWSVICamera_nsfwFASTMOVEV2Q8L.gguf.aria2"
+)
+
+remove_deprecated_model_files() {
+    local model_file
+
+    for model_file in "${DEPRECATED_MODEL_FILES[@]}"; do
+        if [ -e "$model_file" ] || [ -L "$model_file" ]; then
+            echo "🧹 Removing deprecated model file: $model_file"
+            rm -f "$model_file"
+        fi
+    done
+}
+
+remove_deprecated_model_files
 
 echo "Checking and copying workflow..."
 mkdir -p "$WORKFLOW_DIR"
